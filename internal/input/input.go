@@ -26,6 +26,13 @@ type ContextWindow struct {
 	ContextWindowSize   int     `json:"context_window_size"`
 }
 
+// Worktree represents active worktree details.
+type Worktree struct {
+	Name   string `json:"name"`
+	Path   string `json:"path"`
+	Branch string `json:"branch"`
+}
+
 // Data represents the JSON input piped from Claude Code via stdin.
 type Data struct {
 	SessionID     string        `json:"session_id"`
@@ -34,6 +41,7 @@ type Data struct {
 	Cwd           string        `json:"cwd"`
 	Cost          Cost          `json:"cost"`
 	ContextWindow ContextWindow `json:"context_window"`
+	Worktree      *Worktree     `json:"worktree"`
 }
 
 // Parse decodes JSON from the given reader into a Data struct.

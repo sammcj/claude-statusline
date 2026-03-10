@@ -28,7 +28,7 @@ func TestRenderPlain(t *testing.T) {
 
 func TestRenderDisabledModule(t *testing.T) {
 	cfg := config.Default()
-	cfg.Format = "$model | $git_branch | $cost"
+	cfg.Format = "$model | $session_timer | $cost"
 	data := input.Data{
 		Model: input.Model{DisplayName: "Opus"},
 		Cost:  input.Cost{TotalCostUSD: 1.0},

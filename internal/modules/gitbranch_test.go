@@ -62,4 +62,51 @@ func TestGitBranchModule_Render(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, "", result)
 	})
+
+	t.Run("shows worktree icon when worktree is active", func(t *testing.T) {
+		dir := t.TempDir()
+
+		cmd := exec.Command("git", "init", dir)
+		cmd.Env = append(os.Environ(), "GIT_CONFIG_GLOBAL=/dev/null")
+		require.NoError(t, cmd.Run())
+
+		cmd = exec.Command("git", "-C", dir, "config", "user.email", "test@test.com")
+		require.NoError(t, cmd.Run())
+
+		cmd = exec.Command("git", "-C", dir, "config", "user.name", "Test")
+		require.NoError(t, cmd.Run())
+
+		cmd = exec.Command("git", "-C", dir, "commit", "--allow-empty", "-m", "init")
+		require.NoError(t, cmd.Run())
+
+		data := input.Data{
+			Cwd:      dir,
+			Worktree: &input.Worktree{Name: "feature-branch"},
+		}
+		result, err := GitBranchModule{}.Render(data, cfg)
+		require.NoError(t, err)
+		assert.Contains(t, result, string('\uf0e8')) // worktree icon
+	})
+
+	t.Run("no worktree icon when worktree is nil", func(t *testing.T) {
+		dir := t.TempDir()
+
+		cmd := exec.Command("git", "init", dir)
+		cmd.Env = append(os.Environ(), "GIT_CONFIG_GLOBAL=/dev/null")
+		require.NoError(t, cmd.Run())
+
+		cmd = exec.Command("git", "-C", dir, "config", "user.email", "test@test.com")
+		require.NoError(t, cmd.Run())
+
+		cmd = exec.Command("git", "-C", dir, "config", "user.name", "Test")
+		require.NoError(t, cmd.Run())
+
+		cmd = exec.Command("git", "-C", dir, "commit", "--allow-empty", "-m", "init")
+		require.NoError(t, cmd.Run())
+
+		data := input.Data{Cwd: dir}
+		result, err := GitBranchModule{}.Render(data, cfg)
+		require.NoError(t, err)
+		assert.NotContains(t, result, string('\uf0e8'))
+	})
 }

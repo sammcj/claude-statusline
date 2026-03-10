@@ -12,10 +12,10 @@ import (
 
 func TestDefault(t *testing.T) {
 	cfg := config.Default()
-	assert.Equal(t, "$model | $directory | $cost | $context", cfg.Format)
+	assert.Equal(t, "$directory | $git_branch | $model | $cost | $context", cfg.Format)
 	assert.Equal(t, "default", cfg.Palette)
 	assert.False(t, cfg.Model.Disabled)
-	assert.True(t, cfg.GitBranch.Disabled)
+	assert.False(t, cfg.GitBranch.Disabled)
 	assert.True(t, cfg.SessionTimer.Disabled)
 	assert.True(t, cfg.LinesChanged.Disabled)
 	assert.Equal(t, 5, cfg.Context.BarWidth)
@@ -54,7 +54,7 @@ disabled = false
 func TestLoadMissingFileReturnsDefaults(t *testing.T) {
 	cfg, err := config.Load("/nonexistent/path/config.toml")
 	require.NoError(t, err)
-	assert.Equal(t, "$model | $directory | $cost | $context", cfg.Format)
+	assert.Equal(t, "$directory | $git_branch | $model | $cost | $context", cfg.Format)
 }
 
 func TestResolveStyle(t *testing.T) {

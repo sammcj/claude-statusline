@@ -8,7 +8,7 @@ import (
 	"github.com/felipeelias/claude-statusline/internal/input"
 )
 
-// GitBranchModule renders the current git branch name.
+// GitBranchModule renders the current git branch name with optional worktree indicator.
 type GitBranchModule struct{}
 
 func (GitBranchModule) Name() string { return "git_branch" }
@@ -19,7 +19,15 @@ func (GitBranchModule) Render(data input.Data, cfg config.Config) (string, error
 		return "", nil
 	}
 
-	templateData := struct{ Branch string }{Branch: branch}
+	inWorktree := data.Worktree != nil && data.Worktree.Name != ""
+
+	templateData := struct {
+		Branch     string
+		InWorktree bool
+	}{
+		Branch:     branch,
+		InWorktree: inWorktree,
+	}
 
 	result, err := renderTemplate("git_branch", cfg.GitBranch.Format, templateData)
 	if err != nil {

@@ -88,7 +88,7 @@ type LinesChangedConfig struct {
 // Default returns a Config with hardcoded default values.
 func Default() Config {
 	return Config{
-		Format:  "$model | $directory | $cost | $context",
+		Format:  "$directory | $git_branch | $model | $cost | $context",
 		Palette: "default",
 		Palettes: map[string]map[string]string{
 			"default": {
@@ -131,9 +131,8 @@ func Default() Config {
 			},
 		},
 		GitBranch: GitBranchConfig{
-			Format:   "\ue0a0 {{.Branch}}",
-			Style:    "palette:accent",
-			Disabled: true,
+			Format: "\ue0a0 {{.Branch}}{{if .InWorktree}} \uf0e8{{end}}",
+			Style:  "palette:accent",
 		},
 		SessionTimer: SessionTimerConfig{
 			Format:   "{{.Elapsed}}",
