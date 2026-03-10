@@ -1,0 +1,43 @@
+version: "2"
+
+linters:
+  default: all
+  disable:
+    - depguard
+    - err113
+    - exhaustruct
+    - gochecknoglobals
+    - paralleltest
+    - wrapcheck
+    - wsl
+    - wsl_v5
+  settings:
+    gosec:
+      excludes:
+        - G117
+        - G204
+        - G304
+        - G704
+    tagliatelle:
+      case:
+        rules:
+          json: snake
+          toml: snake
+    varnamelen:
+      ignore-names:
+        - mu
+        - wg
+    revive:
+      rules:
+        - name: exported
+          disabled: true
+        - name: package-comments
+          disabled: true
+  exclusions:
+    presets:
+      - std-error-handling
+      - common-false-positives
+    rules:
+      - path: _test\.go
+        linters:
+          - gosec
