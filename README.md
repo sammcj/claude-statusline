@@ -2,9 +2,7 @@
 
 Configurable status line for [Claude Code](https://docs.anthropic.com/en/docs/claude-code).
 
-```
-~/project |  main | Claude Opus 4 | $0.42 | ██░░░ 42%
-```
+![claude-statusline](assets/screenshot.webp)
 
 ## Installation
 
