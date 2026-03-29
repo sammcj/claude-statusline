@@ -57,6 +57,7 @@ type ContextConfig struct {
 	Style      string      `toml:"style"`
 	Disabled   bool        `toml:"disabled"`
 	BarWidth   int         `toml:"bar_width"`
+	BarStyle   string      `toml:"bar_style"`
 	BarFill    string      `toml:"bar_fill"`
 	BarEmpty   string      `toml:"bar_empty"`
 	Thresholds []Threshold `toml:"thresholds"`
@@ -91,6 +92,7 @@ type UsageConfig struct {
 	Style      string      `toml:"style"`
 	Disabled   bool        `toml:"disabled"`
 	BarWidth   int         `toml:"bar_width"`
+	BarStyle   string      `toml:"bar_style"`
 	BarFill    string      `toml:"bar_fill"`
 	BarEmpty   string      `toml:"bar_empty"`
 	Thresholds []Threshold `toml:"thresholds"`
@@ -98,9 +100,7 @@ type UsageConfig struct {
 
 const (
 	defaultTruncationLength = 3
-	defaultBarWidth         = 5
-	defaultBarFill          = "\u2588" // █
-	defaultBarEmpty         = "\u2591" // ░
+	defaultBarWidth = 5
 	costWarnThreshold       = 5.0
 	ctxWarnThreshold        = 50
 	ctxHighThreshold        = 90
@@ -110,7 +110,6 @@ const (
 
 // Default returns a Config with hardcoded default values.
 //
-//nolint:funlen // single-struct initializer reads best as one block
 func Default() Config {
 	return Config{
 		Preset: "default",
@@ -136,8 +135,6 @@ func Default() Config {
 			Format:   `{{.Bar}} {{printf "%.0f" .UsedPct}}%`,
 			Style:    "green",
 			BarWidth: defaultBarWidth,
-			BarFill:  defaultBarFill,
-			BarEmpty: defaultBarEmpty,
 			Thresholds: []Threshold{
 				{Above: ctxWarnThreshold, Style: "yellow"},
 				{Above: ctxHighThreshold, Style: "red"},
@@ -168,8 +165,6 @@ func Default() Config {
 			Style:    "green",
 			Disabled: true,
 			BarWidth: defaultBarWidth,
-			BarFill:  defaultBarFill,
-			BarEmpty: defaultBarEmpty,
 			Thresholds: []Threshold{
 				{Above: usageWarnThreshold, Style: "yellow"},
 				{Above: usageHighThreshold, Style: "red"},
@@ -274,8 +269,9 @@ format = "$directory | $git_branch | $model | $cost | $context"
 # format = '{{.Bar}} {{printf "%.0f" .UsedPct}}%'
 # style = "green"
 # bar_width = 5
-# bar_fill = "█"
-# bar_empty = "░"
+# bar_style = "classic"  # "classic", "blocks", "dots", "line", "squares"
+# bar_fill = "█"         # overrides bar_style fill character
+# bar_empty = "░"        # overrides bar_style empty character
 # thresholds = [
 #   { above = 50, style = "yellow" },
 #   { above = 90, style = "red" },
@@ -306,6 +302,9 @@ format = "$directory | $git_branch | $model | $cost | $context"
 # format = '{{.BlockBar}} {{printf "%.0f" .BlockPct}}% W:{{printf "%.0f" .WeeklyPct}}%'
 # style = "green"
 # bar_width = 5
+# bar_style = "classic"  # "classic", "blocks", "dots", "line", "squares"
+# bar_fill = "█"         # overrides bar_style fill character
+# bar_empty = "░"        # overrides bar_style empty character
 # thresholds = [
 #   { above = 75, style = "yellow" },
 #   { above = 90, style = "red" },
