@@ -4,53 +4,7 @@ Feature ideas for claude-statusline. Each section describes the feature in detai
 
 ## Priority: High
 
-### 1. Git status indicators
-
-The current `git_branch` module only shows the branch name and a worktree indicator. It should show richer git state: dirty/clean status, ahead/behind remote counts, and staged/unstaged/untracked file counts.
-
-**New template fields:**
-
-| Field            | Type | Description                                                                |
-| ---------------- | ---- | -------------------------------------------------------------------------- |
-| `{{.Staged}}`    | int  | Number of staged files                                                     |
-| `{{.Modified}}`  | int  | Number of modified (unstaged) files                                        |
-| `{{.Untracked}}` | int  | Number of untracked files                                                  |
-| `{{.Ahead}}`     | int  | Commits ahead of upstream                                                  |
-| `{{.Behind}}`    | int  | Commits behind upstream                                                    |
-| `{{.IsDirty}}`   | bool | True if there are any uncommitted changes (staged, modified, or untracked) |
-| `{{.IsClean}}`   | bool | Inverse of IsDirty                                                         |
-| `{{.Conflicts}}` | int  | Number of files with merge conflicts                                       |
-
-**Default format (updated):**
-
-```
- {{.Branch}}{{if .InWorktree}} {{end}}{{if .IsDirty}} *{{end}}{{if .Ahead}} {{.Ahead}}{{end}}{{if .Behind}} {{.Behind}}{{end}}
-```
-
-The default shows a `*` when dirty and up/down arrows for ahead/behind. Users who want verbose output can customize to show counts:
-
-```toml
-[git_branch]
-format = ' {{.Branch}}{{if .Staged}} +{{.Staged}}{{end}}{{if .Modified}} !{{.Modified}}{{end}}{{if .Untracked}} ?{{.Untracked}}{{end}}'
-```
-
-**Implementation:**
-
-Run `git status --porcelain=v2 --branch` in the working directory. This single command provides:
-
-- Branch name (from `# branch.head`)
-- Ahead/behind (from `# branch.ab +N -M`)
-- File statuses (lines starting with `1`, `2`, `u`, `?`)
-
-Parse the porcelain v2 output to populate all fields. This replaces the current `git rev-parse --abbrev-ref HEAD` call, so branch detection and status come from one command instead of two.
-
-**Rename consideration:**
-
-The module name stays `git_branch` and config key stays `[git_branch]` for backwards compatibility — even though it now shows more than the branch. The module struct can be renamed internally if needed.
-
----
-
-### 3. Directory display modes
+### 1. Directory display modes
 
 The directory module currently does tilde substitution and first-character truncation of path segments beyond `truncation_length`. Add a `display_mode` config field that controls the truncation strategy.
 
@@ -77,7 +31,7 @@ display_mode = "truncate"
 
 ---
 
-### 5. Custom command module
+### 2. Custom command module
 
 A new `custom_command` module that runs an arbitrary shell command and displays its output. The full Claude Code JSON payload is piped to the command via stdin, so the command can extract any field.
 
@@ -127,7 +81,7 @@ style = "dim"
 
 ---
 
-### 6. Model name formatting options
+### 3. Model name formatting options
 
 The model module currently exposes `{{.DisplayName}}` from the JSON payload. Add `{{.ID}}` (the raw model ID) and a `{{.Short}}` field that extracts a compact name from the model ID.
 
@@ -158,7 +112,7 @@ format = "{{.Short}}"
 
 ---
 
-### 8. Charset toggle (Nerd Font / text fallback)
+### 4. Charset toggle (Nerd Font / text fallback)
 
 Add a top-level `charset` config field that controls whether icon characters use Nerd Font glyphs or plain ASCII/text fallbacks. This affects the default format templates for modules that use icons (git_branch, powerline separators).
 
@@ -193,7 +147,7 @@ charset = "nerd-font"
 
 ---
 
-### 9. Output style module
+### 5. Output style module
 
 A new `output_style` module that shows Claude Code's current output style. The `output_style.name` field is confirmed present in the JSON payload.
 
@@ -225,7 +179,7 @@ disabled = true
 
 ---
 
-### 10. Clickable hyperlinks (OSC 8)
+### 6. Clickable hyperlinks (OSC 8)
 
 Add OSC 8 terminal hyperlink support to modules where it makes sense:
 
@@ -268,7 +222,7 @@ hyperlink_url_template = "vscode://file{{.AbsPath}}"
 
 ---
 
-### 11. Session name module
+### 7. Session name module
 
 A new `session_name` module that shows the session's custom title (set via `/rename` in Claude Code). The session name is stored in the transcript JSONL file as a `custom-title` entry.
 
@@ -317,7 +271,7 @@ disabled = true
 
 ---
 
-### 12. Vim mode module
+### 8. Vim mode module
 
 A new `vim_mode` module that shows the current vim editor mode when vim mode is enabled in Claude Code. The `vim.mode` field is in the JSON payload.
 
@@ -350,7 +304,7 @@ disabled = true
 
 ---
 
-### 13. Agent name module
+### 9. Agent name module
 
 A new `agent_name` module that shows the agent name when running with `--agent` or agent settings. The `agent.name` field is in the JSON payload.
 
@@ -383,7 +337,7 @@ disabled = true
 
 ---
 
-### 14. Token counts module
+### 10. Token counts module
 
 A new `tokens` module that shows token usage statistics from the JSON payload. Exposes cumulative totals, current context usage, and cache metrics.
 
@@ -441,7 +395,7 @@ format = "{{.TotalInput}}in {{.TotalOutput}}out | cache {{.CacheRead}}r {{.Cache
 
 ---
 
-### 15. Worktree details module
+### 11. Worktree details module
 
 Expand the current worktree support from a simple boolean indicator on `git_branch` to a dedicated `worktree` module with full details. The JSON payload includes `worktree.name`, `worktree.path`, `worktree.branch`, `worktree.original_cwd`, and `worktree.original_branch`.
 
@@ -479,7 +433,7 @@ disabled = true
 
 ---
 
-### 16. PR links module
+### 12. PR links module
 
 A new `pr` module that shows PRs created during the current session. PR data is stored in the transcript JSONL file as `pr-link` entries.
 
@@ -548,7 +502,7 @@ format = "{{if .Count}}{{.Count}} PRs{{end}}"
 
 ---
 
-### 17. Project directory module
+### 13. Project directory module
 
 A new `project_dir` module that shows the project directory where Claude Code was launched. This differs from `cwd` when the working directory changes during a session (e.g., via `cd` or worktree).
 
@@ -586,7 +540,7 @@ disabled = true
 
 ## Priority: Medium
 
-### 18. Timeout for git subprocess calls
+### 14. Timeout for git subprocess calls
 
 The `git_branch` module runs `git status --porcelain=v2 --branch` (detailed mode) or `git rev-parse --abbrev-ref HEAD` (simple mode) without a timeout. On network-mounted repos or hung git processes, this could block the status line indefinitely.
 
@@ -596,7 +550,7 @@ Replace `exec.Command` with `exec.CommandContext` using a `context.WithTimeout` 
 
 ---
 
-### 19. Multi-line layout
+### 15. Multi-line layout
 
 Allow the format string to define multiple lines using `\n` as a line separator. Claude Code's status line natively supports multiple output lines — each `echo`/line in the output becomes a separate row.
 
@@ -622,7 +576,7 @@ Line 2: $0.42 | ███░░ 60% | 05m23s
 
 ---
 
-### 20. Flex separator
+### 16. Flex separator
 
 A special token `$fill` in the format string that expands to fill available terminal width, enabling right-aligned segments.
 
@@ -648,7 +602,7 @@ This would render:
 
 ---
 
-### 21. Message count module
+### 17. Message count module
 
 A new `messages` module that shows the number of user and assistant messages in the current session. Reads from the transcript JSONL file.
 
@@ -683,7 +637,7 @@ disabled = true
 
 ---
 
-### 22. Exceeds 200k indicator
+### 18. Exceeds 200k indicator
 
 Add a `{{.Exceeds200k}}` boolean field to the context module that is true when `exceeds_200k_tokens` is true in the JSON payload. This warns when the last API response exceeded 200k total tokens.
 
@@ -706,37 +660,7 @@ format = '{{.Bar}} {{printf "%.0f" .UsedPct}}%{{if .Exceeds200k}} LARGE{{end}}'
 
 ## Priority: Low
 
-### 23. Usage API integration
-
-Query the Anthropic OAuth API (`api.anthropic.com/api/oauth/usage`) to show real-time 5-hour block and 7-day usage percentages.
-
-**Config:**
-
-```toml
-[usage]
-disabled = true
-display = "block"  # "block" (5-hour), "weekly", or "both"
-style = "dim"
-cache_ttl_seconds = 300
-```
-
-**Behavior:**
-
-- Read OAuth credentials from `~/.claude/.credentials.json` (or macOS Keychain on macOS).
-- Cache responses locally (at `~/.cache/claude-statusline/usage.json`) to avoid hitting the API on every render.
-- Show usage as a percentage (e.g., `72%` of 5-hour block used).
-- Gracefully degrade: if credentials are missing or the API is unreachable, render empty.
-
-**Why lower priority:**
-
-- Requires HTTP calls (adds latency, even with caching).
-- Requires reading credentials from the filesystem or OS keychain.
-- Adds complexity (caching, error handling, credential discovery).
-- The data is useful but not essential for most users.
-
----
-
-### 24. Skills / hooks tracking
+### 19. Skills / hooks tracking
 
 Track which Claude Code tools/skills are invoked during a session by integrating with Claude Code hooks.
 
