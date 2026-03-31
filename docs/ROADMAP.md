@@ -148,50 +148,7 @@ disabled = true
 
 ---
 
-### 5. Clickable hyperlinks (OSC 8)
-
-Add OSC 8 terminal hyperlink support to modules where it makes sense:
-
-- `git_branch`: link to the GitHub branch page
-- `directory`: link to open the directory in an editor
-
-OSC 8 format: `\033]8;;URL\033\\TEXT\033]8;;\033\\`
-
-**Config:**
-
-```toml
-[git_branch]
-hyperlink = true
-hyperlink_base_url = ""  # auto-detected from git remote
-```
-
-```toml
-[directory]
-hyperlink = true
-hyperlink_url_template = "vscode://file{{.AbsPath}}"
-```
-
-**git_branch hyperlink:**
-
-- When `hyperlink = true`, wrap the branch name in an OSC 8 link.
-- Auto-detect the base URL from `git remote get-url origin`, converting SSH URLs to HTTPS and appending `/tree/{branch}`.
-- `hyperlink_base_url` allows manual override if the remote URL detection doesn't work (e.g., private GitLab instances).
-- If no remote URL can be determined and no override is set, render the branch name without a link (graceful degradation).
-
-**directory hyperlink:**
-
-- When `hyperlink = true`, wrap the directory text in an OSC 8 link.
-- `hyperlink_url_template` is a Go template with `{{.AbsPath}}` available, defaulting to `file://{{.AbsPath}}`.
-- Users can set it to `vscode://file{{.AbsPath}}` to open in VS Code.
-
-**Behavior:**
-
-- Default: `hyperlink = false` on both modules (opt-in).
-- Terminals that don't support OSC 8 will simply display the text without the link (the escape sequences are invisible in unsupported terminals).
-
----
-
-### 6. Session name module
+### 5. Session name module
 
 A new `session_name` module that shows the session's custom title (set via `/rename` in Claude Code). The session name is stored in the transcript JSONL file as a `custom-title` entry.
 
@@ -240,73 +197,7 @@ disabled = true
 
 ---
 
-### 7. Vim mode module
-
-A new `vim_mode` module that shows the current vim editor mode when vim mode is enabled in Claude Code. The `vim.mode` field is in the JSON payload.
-
-**Config:**
-
-```toml
-[vim_mode]
-format = "{{.Mode}}"
-style = "bold yellow"
-disabled = true
-```
-
-| Field      | Type   | Default         | Description         |
-| ---------- | ------ | --------------- | ------------------- |
-| `format`   | string | `"{{.Mode}}"`  | Go template         |
-| `style`    | string | `"bold yellow"` | ANSI style          |
-| `disabled` | bool   | `true`          | Disabled by default |
-
-**Template fields:**
-
-| Field       | Type   | Description                      |
-| ----------- | ------ | -------------------------------- |
-| `{{.Mode}}` | string | Vim mode: `NORMAL` or `INSERT`   |
-
-**Behavior:**
-
-- Referenced as `$vim_mode` in the format string.
-- If `vim` is absent from the JSON (vim mode not enabled), renders empty.
-- Useful for users who enable vim mode and want a persistent mode indicator.
-
----
-
-### 8. Agent name module
-
-A new `agent_name` module that shows the agent name when running with `--agent` or agent settings. The `agent.name` field is in the JSON payload.
-
-**Config:**
-
-```toml
-[agent_name]
-format = "{{.Name}}"
-style = "bold magenta"
-disabled = true
-```
-
-| Field      | Type   | Default          | Description         |
-| ---------- | ------ | ---------------- | ------------------- |
-| `format`   | string | `"{{.Name}}"`   | Go template         |
-| `style`    | string | `"bold magenta"` | ANSI style          |
-| `disabled` | bool   | `true`           | Disabled by default |
-
-**Template fields:**
-
-| Field       | Type   | Description                                   |
-| ----------- | ------ | --------------------------------------------- |
-| `{{.Name}}` | string | Agent name (e.g., `"security-reviewer"`)      |
-
-**Behavior:**
-
-- Referenced as `$agent_name` in the format string.
-- If `agent` is absent from the JSON (not running as agent), renders empty.
-- Useful for users running named agents who want to identify which agent is active.
-
----
-
-### 9. Token counts module
+### 6. Token counts module
 
 A new `tokens` module that shows token usage statistics from the JSON payload. Exposes cumulative totals, current context usage, and cache metrics.
 
@@ -364,7 +255,7 @@ format = "{{.TotalInput}}in {{.TotalOutput}}out | cache {{.CacheRead}}r {{.Cache
 
 ---
 
-### 10. Worktree details module
+### 7. Worktree details module
 
 Expand the current worktree support from a simple boolean indicator on `git_branch` to a dedicated `worktree` module with full details. The JSON payload includes `worktree.name`, `worktree.path`, `worktree.branch`, `worktree.original_cwd`, and `worktree.original_branch`.
 
@@ -402,7 +293,7 @@ disabled = true
 
 ---
 
-### 11. PR links module
+### 8. PR links module
 
 A new `pr` module that shows PRs created during the current session. PR data is stored in the transcript JSONL file as `pr-link` entries.
 
@@ -471,7 +362,7 @@ format = "{{if .Count}}{{.Count}} PRs{{end}}"
 
 ---
 
-### 12. Project directory module
+### 9. Project directory module
 
 A new `project_dir` module that shows the project directory where Claude Code was launched. This differs from `cwd` when the working directory changes during a session (e.g., via `cd` or worktree).
 
@@ -509,7 +400,7 @@ disabled = true
 
 ## Priority: Medium
 
-### 13. Timeout for git subprocess calls
+### 10. Timeout for git subprocess calls
 
 The `git_branch` module runs `git status --porcelain=v2 --branch` (detailed mode) or `git rev-parse --abbrev-ref HEAD` (simple mode) without a timeout. On network-mounted repos or hung git processes, this could block the status line indefinitely.
 
@@ -519,7 +410,7 @@ Replace `exec.Command` with `exec.CommandContext` using a `context.WithTimeout` 
 
 ---
 
-### 14. Multi-line layout
+### 11. Multi-line layout
 
 Allow the format string to define multiple lines using `\n` as a line separator. Claude Code's status line natively supports multiple output lines — each `echo`/line in the output becomes a separate row.
 
@@ -545,7 +436,7 @@ Line 2: $0.42 | ███░░ 60% | 05m23s
 
 ---
 
-### 15. Flex separator
+### 12. Flex separator
 
 A special token `$fill` in the format string that expands to fill available terminal width, enabling right-aligned segments.
 
@@ -571,7 +462,7 @@ This would render:
 
 ---
 
-### 16. Message count module
+### 13. Message count module
 
 A new `messages` module that shows the number of user and assistant messages in the current session. Reads from the transcript JSONL file.
 
@@ -606,7 +497,7 @@ disabled = true
 
 ---
 
-### 17. Exceeds 200k indicator
+### 14. Exceeds 200k indicator
 
 Add a `{{.Exceeds200k}}` boolean field to the context module that is true when `exceeds_200k_tokens` is true in the JSON payload. This warns when the last API response exceeded 200k total tokens.
 
@@ -629,7 +520,7 @@ format = '{{.Bar}} {{printf "%.0f" .UsedPct}}%{{if .Exceeds200k}} LARGE{{end}}'
 
 ## Priority: Low
 
-### 18. Skills / hooks tracking
+### 15. Skills / hooks tracking
 
 Track which Claude Code tools/skills are invoked during a session by integrating with Claude Code hooks.
 
