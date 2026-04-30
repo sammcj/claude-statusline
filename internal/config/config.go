@@ -28,6 +28,14 @@ type Threshold struct {
 	Style string  `toml:"style"`
 }
 
+// BarMarker defines a glyph rendered on either side of a progress bar when a
+// numeric value exceeds a threshold. The highest matching marker wins.
+type BarMarker struct {
+	Above float64 `toml:"above"`
+	Glyph string  `toml:"glyph"`
+	Style string  `toml:"style"`
+}
+
 // ModelConfig holds model module settings.
 type ModelConfig struct {
 	Format   string `toml:"format"`
@@ -60,6 +68,7 @@ type ContextConfig struct {
 	BarFill    string      `toml:"bar_fill"`
 	BarEmpty   string      `toml:"bar_empty"`
 	Thresholds []Threshold `toml:"thresholds"`
+	BarMarkers []BarMarker `toml:"bar_markers"`
 }
 
 // GitBranchConfig holds git branch module settings.
@@ -103,9 +112,38 @@ const (
 	costWarnThreshold       = 5.0
 	ctxWarnThreshold        = 50
 	ctxHighThreshold        = 90
+	ctxMarkerWarnThreshold  = 20
+	ctxMarkerHighThreshold  = 30
+	ctxMarkerCritThreshold  = 35
 	usageWarnThreshold      = 75
 	usageHighThreshold      = 90
 )
+
+// markerGlyph is the default attention glyph rendered around the context bar
+// once usage exceeds a marker threshold (U+25B2 BLACK UP-POINTING TRIANGLE).
+// Renders without a Nerd Font.
+const markerGlyph = "▲"
+
+// defaultContextConfig returns the default context module configuration,
+// including bar markers that flag rising context usage with coloured triangles.
+func defaultContextConfig() ContextConfig {
+	return ContextConfig{
+		Format:   `{{.Bar}} {{printf "%.0f" .UsedPct}}%`,
+		Style:    "green",
+		BarWidth: defaultBarWidth,
+		BarFill:  defaultBarFill,
+		BarEmpty: defaultBarEmpty,
+		Thresholds: []Threshold{
+			{Above: ctxWarnThreshold, Style: "yellow"},
+			{Above: ctxHighThreshold, Style: "red"},
+		},
+		BarMarkers: []BarMarker{
+			{Above: ctxMarkerWarnThreshold, Glyph: markerGlyph, Style: "208"}, // orange
+			{Above: ctxMarkerHighThreshold, Glyph: markerGlyph, Style: "202"}, // orange-red
+			{Above: ctxMarkerCritThreshold, Glyph: markerGlyph, Style: "red"},
+		},
+	}
+}
 
 // Default returns a Config with hardcoded default values.
 func Default() Config {
@@ -129,17 +167,7 @@ func Default() Config {
 				{Above: costWarnThreshold, Style: "red"},
 			},
 		},
-		Context: ContextConfig{
-			Format:   `{{.Bar}} {{printf "%.0f" .UsedPct}}%`,
-			Style:    "green",
-			BarWidth: defaultBarWidth,
-			BarFill:  defaultBarFill,
-			BarEmpty: defaultBarEmpty,
-			Thresholds: []Threshold{
-				{Above: ctxWarnThreshold, Style: "yellow"},
-				{Above: ctxHighThreshold, Style: "red"},
-			},
-		},
+		Context: defaultContextConfig(),
 		GitBranch: GitBranchConfig{
 			Format: iconBranch + " {{.Branch}}{{if .InWorktree}} " + iconWorktree + "{{end}}",
 			Style:  "cyan",
@@ -272,6 +300,13 @@ format = "$directory | $git_branch | $model | $cost | $context"
 #   { above = 50, style = "yellow" },
 #   { above = 90, style = "red" },
 # ]
+# Attention markers rendered on either side of the bar at the given thresholds.
+# The highest matching marker wins. Set to [] to disable.
+# bar_markers = [
+#   { above = 20, glyph = "▲", style = "208" }, # orange
+#   { above = 30, glyph = "▲", style = "202" }, # orange-red
+#   { above = 35, glyph = "▲", style = "red" },
+# ]
 
 # [git_branch]
 # format = " {{.Branch}}{{if .InWorktree}} {{end}}"
@@ -302,7 +337,9 @@ format = "$directory | $git_branch | $model | $cost | $context"
 # ]
 #
 # To only show usage when it exceeds a threshold:
-# format = '{{if ge .BlockPct 70.0}}{{.BlockBar}} {{printf "%.0f" .BlockPct}}%{{end}}{{if ge .WeeklyPct 80.0}} W:{{printf "%.0f" .WeeklyPct}}%{{end}}'
+# format = '` +
+	`{{if ge .BlockPct 70.0}}{{.BlockBar}} {{printf "%.0f" .BlockPct}}%{{end}}` +
+	`{{if ge .WeeklyPct 80.0}} W:{{printf "%.0f" .WeeklyPct}}%{{end}}'
 `
 
 // SampleConfig returns a commented TOML config template for the init command.

@@ -49,20 +49,25 @@ func (UsageModule) Render(data input.Data, cfg config.Config) (string, error) {
 	return wrapStyle(result, winningStyle), nil
 }
 
+const (
+	hoursPerDay    = 24
+	minutesPerHour = 60
+)
+
 // formatResetTimestamp converts a Unix timestamp to a human-readable duration like "2h13m" or "3d2h".
 func formatResetTimestamp(ts int64) string {
 	if ts == 0 {
 		return ""
 	}
 
-	d := time.Until(time.Unix(ts, 0))
-	if d <= 0 {
+	remaining := time.Until(time.Unix(ts, 0))
+	if remaining <= 0 {
 		return "0m"
 	}
 
-	days := int(d.Hours()) / 24
-	hours := int(d.Hours()) % 24
-	minutes := int(math.Mod(d.Minutes(), 60))
+	days := int(remaining.Hours()) / hoursPerDay
+	hours := int(remaining.Hours()) % hoursPerDay
+	minutes := int(math.Mod(remaining.Minutes(), minutesPerHour))
 
 	if days > 0 {
 		return fmt.Sprintf("%dd%dh", days, hours)

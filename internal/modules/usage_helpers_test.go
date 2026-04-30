@@ -1,3 +1,4 @@
+//nolint:testpackage // exercises unexported formatResetTimestamp helper
 package modules
 
 import (
@@ -9,7 +10,7 @@ import (
 
 func TestFormatResetTimestamp(t *testing.T) {
 	t.Run("zero returns empty", func(t *testing.T) {
-		assert.Equal(t, "", formatResetTimestamp(0))
+		assert.Empty(t, formatResetTimestamp(0))
 	})
 
 	t.Run("past time returns 0m", func(t *testing.T) {

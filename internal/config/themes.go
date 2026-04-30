@@ -126,6 +126,10 @@ func powerlineConfig(preset string, format string, segFg string, colors [5]strin
 				{Above: ctxWarnThreshold, Style: segStyle(thresholds.warn, colors[4])},
 				{Above: ctxHighThreshold, Style: segStyle(thresholds.high, colors[4])},
 			},
+			BarMarkers: []BarMarker{
+				{Above: ctxMarkerWarnThreshold, Glyph: markerGlyph, Style: segStyle(thresholds.warn, colors[4])},
+				{Above: ctxMarkerHighThreshold, Glyph: markerGlyph, Style: segStyle(thresholds.high, colors[4])},
+			},
 		},
 		SessionTimer: SessionTimerConfig{
 			Format:   " {{if .Hours}}{{.Hours}}h{{end}}{{printf \"%02d\" .Minutes}}m{{printf \"%02d\" .Seconds}}s ",
@@ -155,14 +159,14 @@ func powerlineConfig(preset string, format string, segFg string, colors [5]strin
 // Colors: pink → peach → light blue → teal → dark blue.
 func presetPastelPowerline() Config {
 	colors := [5]string{"#DA627D", "#FCA17D", "#86BBD8", "#06969A", "#33658A"}
-	tc := thresholdColors{warn: "#f9e2af", high: "#f38ba8"}
-	cfg := powerlineConfig("pastel-powerline", capsuleFormat(colors, plRight), "", colors, tc)
+	tcolors := thresholdColors{warn: "#f9e2af", high: "#f38ba8"}
+	cfg := powerlineConfig("pastel-powerline", capsuleFormat(colors, plRight), "", colors, tcolors)
 
 	usageBg := "#7B506F" // muted plum
 	cfg.Usage.Style = segStyle("", usageBg)
 	cfg.Usage.Thresholds = []Threshold{
-		{Above: usageWarnThreshold, Style: segStyle(tc.warn, usageBg)},
-		{Above: usageHighThreshold, Style: segStyle(tc.high, usageBg)},
+		{Above: usageWarnThreshold, Style: segStyle(tcolors.warn, usageBg)},
+		{Above: usageHighThreshold, Style: segStyle(tcolors.high, usageBg)},
 	}
 
 	return cfg
@@ -186,14 +190,14 @@ func presetTokyoNight() Config {
 		"$context" +
 		"[" + plRightCap + " ](fg:" + colors[4] + ")"
 
-	tc := thresholdColors{warn: "#e0af68", high: "#f7768e"}
-	cfg := powerlineConfig("tokyo-night", format, "#e3e5e5", colors, tc)
+	tcolors := thresholdColors{warn: "#e0af68", high: "#f7768e"}
+	cfg := powerlineConfig("tokyo-night", format, "#e3e5e5", colors, tcolors)
 
 	usageBg := "#292e42" // tokyo night surface
 	cfg.Usage.Style = segStyle("#e3e5e5", usageBg)
 	cfg.Usage.Thresholds = []Threshold{
-		{Above: usageWarnThreshold, Style: segStyle(tc.warn, usageBg)},
-		{Above: usageHighThreshold, Style: segStyle(tc.high, usageBg)},
+		{Above: usageWarnThreshold, Style: segStyle(tcolors.warn, usageBg)},
+		{Above: usageHighThreshold, Style: segStyle(tcolors.high, usageBg)},
 	}
 
 	return cfg
@@ -204,14 +208,14 @@ func presetTokyoNight() Config {
 // Colors: yellow → aqua → blue → gray → dark.
 func presetGruvboxRainbow() Config {
 	colors := [5]string{"#d79921", "#689d6a", "#458588", "#665c54", "#3c3836"}
-	tc := thresholdColors{warn: "#fabd2f", high: "#fb4934"}
-	cfg := powerlineConfig("gruvbox-rainbow", capsuleFormat(colors, plRightCap), "#fbf1c7", colors, tc)
+	tcolors := thresholdColors{warn: "#fabd2f", high: "#fb4934"}
+	cfg := powerlineConfig("gruvbox-rainbow", capsuleFormat(colors, plRightCap), "#fbf1c7", colors, tcolors)
 
 	usageBg := "#504945" // gruvbox bg2 (warm brown)
 	cfg.Usage.Style = segStyle("#fbf1c7", usageBg)
 	cfg.Usage.Thresholds = []Threshold{
-		{Above: usageWarnThreshold, Style: segStyle(tc.warn, usageBg)},
-		{Above: usageHighThreshold, Style: segStyle(tc.high, usageBg)},
+		{Above: usageWarnThreshold, Style: segStyle(tcolors.warn, usageBg)},
+		{Above: usageHighThreshold, Style: segStyle(tcolors.high, usageBg)},
 	}
 
 	return cfg
@@ -222,8 +226,8 @@ func presetGruvboxRainbow() Config {
 // Colors: peach → yellow → green → sapphire → lavender.
 func presetCatppuccin() Config {
 	colors := [5]string{"#fab387", "#f9e2af", "#a6e3a1", "#74c7ec", "#b4befe"}
-	tc := thresholdColors{warn: "#f9e2af", high: "#f38ba8"}
-	cfg := powerlineConfig("catppuccin", capsuleFormat(colors, plRightCap), "#11111b", colors, tc)
+	tcolors := thresholdColors{warn: "#f9e2af", high: "#f38ba8"}
+	cfg := powerlineConfig("catppuccin", capsuleFormat(colors, plRightCap), "#11111b", colors, tcolors)
 
 	usageBg := "#cba6f7" // catppuccin mauve
 	cfg.Usage.Style = segStyle("#11111b", usageBg)

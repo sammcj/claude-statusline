@@ -45,6 +45,13 @@
 #   { above = 70, style = "208" },
 #   { above = 90, style = "palette:ctx_high" },
 # ]
+# Attention markers rendered on either side of the bar. The highest matching
+# marker wins. Set to [] to disable.
+# bar_markers = [
+#   { above = 20, glyph = "▲", style = "208" }, # orange
+#   { above = 30, glyph = "▲", style = "202" }, # orange-red
+#   { above = 35, glyph = "▲", style = "red" },
+# ]
 
 # [git_branch]
 # format = "\ue0a0 {{.Branch}}{{if .InWorktree}} \uf0e8{{end}}"
